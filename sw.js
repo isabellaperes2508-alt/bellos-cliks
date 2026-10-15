@@ -1,6 +1,6 @@
 /* Bellos Cliks: service worker do app. Sempre busca a versão mais nova na internet;
    usa a cópia salva só quando o aparelho está sem conexão. */
-const CACHE = 'bellos-v1';
+const CACHE = 'bellos-v2';
 const BASICO = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/apple-touch-icon.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BASICO)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
