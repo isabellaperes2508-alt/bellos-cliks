@@ -8,9 +8,16 @@
 <meta property="og:description" content="Foto, vídeo, Reels, storymaker e sites. Monte seu orçamento em 2 minutos e veja o valor na hora.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://belloscliks.netlify.app/">
+<meta property="og:image" content="https://belloscliks.netlify.app/icons/icon-512.png">
 <link rel="canonical" href="https://belloscliks.netlify.app/">
+<link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#A3285F">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23A3285F'/%3E%3Ccircle cx='16' cy='17' r='7' fill='none' stroke='white' stroke-width='3'/%3E%3Crect x='10' y='6' width='7' height='4' rx='1.5' fill='white'/%3E%3C/svg%3E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bellos Cliks">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="/icons/favicon-64.png">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>Orçamento Bellos Cliks</title>
 </head>
@@ -527,10 +534,26 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
     var go = el('a','btn','Enviar pedido para a Isa');
     go.href = ENDPOINT + code;
     if(!NO_GITHUB){ go.target = '_blank'; go.rel = 'noopener'; }
-    go.addEventListener('click', function(){
+    function enviado(){
       $('send-t').textContent = 'Pedido enviado ✓';
       $('send-p').textContent = 'Recebido! A Isa vai analisar e te chamar no WhatsApp ' + quote.whats + ' em até 24h úteis. Se preferir adiantar, você também pode mandar o pedido por mensagem.';
       go.textContent = 'Enviar de novo'; go.style.background = 'var(--surface)'; go.style.color = 'var(--ink)'; go.style.border = '1px solid var(--line)';
+    }
+    go.addEventListener('click', function(e){
+      if(!NO_GITHUB){ enviado(); return; }
+      /* Hospedada (Netlify/app instalado): envia sem sair da página */
+      e.preventDefault();
+      if(go.dataset.busy) return;
+      go.dataset.busy = '1'; var txt = go.textContent; go.textContent = 'Enviando…';
+      fetch(go.href + '?r=json', {cache:'no-store'}).then(function(r){ return r.json().then(function(j){ return {ok:r.ok && j && j.ok, motivo:j && j.motivo}; }, function(){ return {ok:false}; }); })
+        .then(function(res){
+          if(res.ok){ enviado(); return; }
+          go.textContent = txt;
+          $('send-p').textContent = res.motivo === 'limite'
+            ? 'Muitos pedidos chegaram agora há pouco. Tente de novo em alguns minutos ou fale com a Isa pelo WhatsApp.'
+            : 'Não conseguimos registrar o pedido. Toque em Falar no WhatsApp para enviar por mensagem.';
+        }, function(){ window.location.href = go.href; })
+        .then(function(){ delete go.dataset.busy; });
     });
     row.appendChild(go);
     if(WHATSAPP){
@@ -574,6 +597,11 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
     });
     tb.appendChild(tt); tb.appendChild(fill);
     var hdr = document.querySelector('header'); hdr.parentNode.insertBefore(tb, hdr.nextSibling);
+  }
+
+  /* App instalável: registra o service worker quando a página está hospedada */
+  if(NO_GITHUB && 'serviceWorker' in navigator){
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js').catch(function(){}); });
   }
 
   /* Return screen after the order endpoint redirects back here */

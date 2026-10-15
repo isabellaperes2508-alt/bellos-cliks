@@ -1,0 +1,604 @@
+<title>Orçamento Bellos Cliks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column, numbered steps (a real sequence), then a summary sheet that replaces the form */
+:root{
+  --bg:#F4F3F7; --surface:#FFFFFF; --ink:#1D1A26; --muted:#686377; --line:#E2DFE9;
+  --accent:#A3285F; --accent-soft:#F7E4ED; --on-accent:#FFFFFF;
+  --ok:#1C7454; --ok-soft:#DDF1E8; --warn:#8C5F05; --warn-soft:#FBEFD3; --bad:#B3261E;
+  --display:'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body:'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15131B; --surface:#1E1B26; --ink:#EEEBF4; --muted:#A39DB2; --line:#322E3D;
+  --accent:#E57AA7; --accent-soft:#3A1F2D; --on-accent:#1A0F15;
+  --ok:#62C9A0; --ok-soft:#14332A; --warn:#E6B552; --warn-soft:#3A2D10; --bad:#F2948A;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#15131B; --surface:#1E1B26; --ink:#EEEBF4; --muted:#A39DB2; --line:#322E3D;
+  --accent:#E57AA7; --accent-soft:#3A1F2D; --on-accent:#1A0F15;
+  --ok:#62C9A0; --ok-soft:#14332A; --warn:#E6B552; --warn-soft:#3A2D10; --bad:#F2948A;
+  color-scheme:dark }
+
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15.5px;line-height:1.55;font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 72px;display:flex;flex-direction:column;gap:36px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}
+.rec{width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block}
+@media (prefers-reduced-motion:no-preference){ .rec{animation:blink 1.6s steps(1) infinite} @keyframes blink{50%{opacity:.25}} }
+h1{font-family:var(--display);font-weight:800;font-size:clamp(32px,7vw,50px);line-height:1.03;letter-spacing:-.02em;margin:10px 0 12px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{color:var(--muted);margin:0;max-width:58ch}
+
+.step{display:flex;flex-direction:column;gap:16px}
+.step-head{display:flex;gap:14px;align-items:baseline}
+.step-n{font-family:var(--mono);font-size:13px;color:var(--accent);min-width:2ch}
+.step-head h2{font-family:var(--display);font-weight:700;font-size:23px;margin:0;letter-spacing:-.01em}
+.step-head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.wide{grid-column:1 / -1}
+.field label{font-size:13px;font-weight:600}
+.field label .opt{font-weight:400;color:var(--muted)}
+input[type=text],input[type=tel],input[type=date],input[type=number],textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0;box-sizing:border-box}
+textarea{min-height:110px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.err{color:var(--bad);font-size:13px;min-height:0}
+
+.cat{display:flex;flex-direction:column;gap:10px}
+.cat h3{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:6px 0 0;font-weight:500}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.opt-card{position:relative;display:flex;flex-direction:column;gap:4px;padding:14px 14px 14px 44px;background:var(--surface);border:1px solid var(--line);border-radius:10px;cursor:pointer;transition:border-color .15s}
+.opt-card:hover{border-color:var(--muted)}
+.opt-card input[type=checkbox]{position:absolute;left:14px;top:16px;width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.opt-card .t{font-weight:600}
+.opt-card .d{font-size:13.5px;color:var(--muted);line-height:1.4}
+.opt-card .tag{font-family:var(--mono);font-size:11px;color:var(--accent)}
+.opt-card:has(input:checked){border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent);background:var(--accent-soft)}
+.opt-card:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.qty{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--muted)}
+.qty input{width:90px;padding:6px 8px}
+
+.note{font-size:13.5px;color:var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px 12px;margin:0}
+.rot{display:flex;flex-direction:column;gap:12px;border:1px solid var(--accent);border-radius:12px;padding:16px;background:var(--surface)}
+.rot h3{font-family:var(--display);font-size:18px;margin:0}
+.rot > p{margin:0;font-size:14px;color:var(--muted)}
+.rot-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.rot-opts .opt-card input[type=radio]{position:absolute;left:14px;top:16px;width:18px;height:18px;margin:0;accent-color:var(--accent)}
+.extras{display:flex;flex-direction:column;gap:8px}
+.extras label{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;cursor:pointer}
+.extras input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+.extras span small{display:block;color:var(--muted);font-size:13px}
+
+.finish{display:flex;flex-direction:column;gap:10px;border-top:2px solid var(--ink);padding-top:18px}
+.finish-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.count{font-size:14px;color:var(--muted)}
+button{font:inherit;font-size:15px;font-weight:600;border-radius:10px;padding:12px 20px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button:focus-visible,a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+a.btn{display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;border-radius:10px;padding:12px 20px;text-decoration:none;background:var(--accent);color:var(--on-accent)}
+
+/* Summary sheet with viewfinder corners */
+.sheet{position:relative;padding:28px 24px;display:flex;flex-direction:column;gap:22px;background:
+  linear-gradient(var(--accent),var(--accent)) top left/22px 2px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) top left/2px 22px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) top right/22px 2px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) top right/2px 22px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) bottom left/22px 2px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) bottom left/2px 22px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) bottom right/22px 2px no-repeat,
+  linear-gradient(var(--accent),var(--accent)) bottom right/2px 22px no-repeat,
+  var(--surface)}
+.sheet h2{font-family:var(--display);font-weight:800;font-size:28px;margin:0;letter-spacing:-.01em}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 18px}
+.meta div{display:flex;flex-direction:column;min-width:0}
+.meta .k{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.meta .v{font-weight:600;overflow-wrap:anywhere}
+.lines{border-top:1px solid var(--ink)}
+.line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 16px;padding:14px 0;border-bottom:1px solid var(--line)}
+.line .nm{font-weight:600}
+.line .cat-l{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.line ul{grid-column:1;margin:4px 0 0;padding-left:18px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:2px}
+.line .pr{grid-column:2;grid-row:1 / span 2;font-family:var(--display);font-weight:700;font-size:19px;text-align:right;white-space:nowrap;align-self:start}
+.line .pr small{display:block;font-family:var(--body);font-size:12px;font-weight:500;color:var(--muted)}
+.line.analise .pr{color:var(--warn);font-size:15px}
+.line .custom{grid-column:1;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);margin-top:4px}
+.totals{display:flex;flex-direction:column;gap:6px}
+.tot{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.tot .k{font-weight:600}
+.tot .v{font-family:var(--display);font-weight:800;font-size:30px;color:var(--accent)}
+.tot.sub .v{font-size:20px;color:var(--ink)}
+.terms{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.cta{display:flex;flex-direction:column;gap:12px;border-top:2px solid var(--ink);padding-top:18px}
+.cta h3{font-family:var(--display);font-size:20px;margin:0}
+.cta p{margin:0;color:var(--muted);font-size:14px}
+.cta-row{display:flex;flex-wrap:wrap;gap:10px}
+.send{display:flex;flex-direction:column;gap:12px;background:var(--ok-soft);border-radius:12px;padding:18px}
+.send h3{font-family:var(--display);font-size:20px;margin:0;color:var(--ok)}
+.send p{margin:0;font-size:14px}
+.send pre{margin:0;font-family:var(--mono);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;max-height:220px;overflow:auto;color:var(--ink)}
+.toast{font-size:13.5px;color:var(--ok);font-weight:600;min-height:1.2em}
+footer{font-size:12.5px;color:var(--muted);text-align:center;display:flex;flex-direction:column;gap:6px}
+footer .contato{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center}
+footer a{color:var(--accent);font-weight:600;text-decoration:none}
+footer a:hover,footer a:focus-visible{text-decoration:underline}
+
+@media (max-width:560px){
+  .fields{grid-template-columns:1fr}
+  .sheet{padding:24px 16px}
+  .tot .v{font-size:26px}
+  .cta-row > *{flex:1 1 100%}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow"><span class="rec" aria-hidden="true"></span>Bellos Cliks · Orçamento online</div>
+    <h1>Monte seu orçamento <em>em 2 minutos</em></h1>
+    <p class="lede">Foto, vídeo, Reels, storymaker e sites para profissionais, empresas e eventos. Escolha o que precisa, conte o que tem em mente e veja o valor na hora.</p>
+  </header>
+
+  <form id="form" novalidate>
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <section class="step" aria-labelledby="s1">
+        <div class="step-head"><span class="step-n">01</span><div><h2 id="s1">Seus dados</h2><p>Pra gente saber com quem está falando.</p></div></div>
+        <div class="fields">
+          <div class="field wide"><label for="f-nome">Nome ou empresa</label><input type="text" id="f-nome" autocomplete="name" placeholder="Ex.: Clínica Sorriso ou Ana Souza"></div>
+          <div class="field"><label for="f-whats">Seu WhatsApp</label><input type="tel" id="f-whats" autocomplete="tel" placeholder="(27) 99999-0000"></div>
+          <div class="field"><label for="f-data">Data do serviço <span class="opt">(se já tiver)</span></label><input type="date" id="f-data"></div>
+          <div class="field wide"><label for="f-local">Local <span class="opt">(cidade, bairro ou endereço)</span></label><input type="text" id="f-local" placeholder="Ex.: Vitória, Praia do Canto"></div>
+        </div>
+        <div class="err" id="e-dados" role="alert"></div>
+      </section>
+
+      <section class="step" aria-labelledby="s2">
+        <div class="step-head"><span class="step-n">02</span><div><h2 id="s2">O que você precisa?</h2><p>Marque um ou mais serviços. O valor aparece no resumo.</p></div></div>
+        <div id="cats" style="display:flex;flex-direction:column;gap:18px"></div>
+        <div class="rot" id="rot-box" hidden>
+          <h3>Roteiros dos vídeos</h3>
+          <p>Você marcou um serviço com gravação. Quem prepara o que vai ser gravado?</p>
+          <div class="rot-opts" role="radiogroup" aria-label="Roteiros dos vídeos">
+            <label class="opt-card" for="rot-cliente"><input type="radio" name="rot" id="rot-cliente" value="cliente"><span class="t">Já tenho minhas ideias</span><span class="d">Você envia temas ou roteiros até 3 dias antes. A Isa organiza a ordem de gravação.</span><span class="tag">Sem custo</span></label>
+            <label class="opt-card" for="rot-bella"><input type="radio" name="rot" id="rot-bella" value="bella"><span class="t">Quero que a Bellos Cliks crie</span><span class="d">Pesquisa de temas, gancho, roteiro e 1 ajuste antes da gravação.</span>
+              <span class="qty">Roteiros: <input type="number" id="rot-qtd" min="1" max="30" step="1" value="4" aria-label="Quantidade de roteiros"></span></label>
+          </div>
+          <div class="err" id="e-rot" role="alert"></div>
+        </div>
+      </section>
+
+      <section class="step" aria-labelledby="s3">
+        <div class="step-head"><span class="step-n">03</span><div><h2 id="s3">Quer algo mais específico?</h2><p>Descreva do seu jeito: mais horas, outro formato, um projeto diferente.</p></div></div>
+        <div class="field wide"><label for="f-custom">Serviço personalizado <span class="opt">(opcional)</span></label><textarea id="f-custom" placeholder="Ex.: preciso de fotos da equipe de 12 pessoas e um vídeo curto do consultório para o site."></textarea></div>
+        <p class="note">Pedidos personalizados ficam em análise. A Isa avalia o que você descreveu e envia o valor pelo WhatsApp em até 24h úteis.</p>
+      </section>
+
+      <section class="step" aria-labelledby="s4">
+        <div class="step-head"><span class="step-n">04</span><div><h2 id="s4">Extras</h2><p>Opcional.</p></div></div>
+        <div class="extras" id="extras"></div>
+      </section>
+
+      <div class="finish">
+        <div class="err" id="e-serv" role="alert"></div>
+        <div class="finish-row">
+          <span class="count" id="count">Nenhum serviço marcado</span>
+          <button type="submit" class="primary" id="b-done">Concluir e ver valor</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <section id="result" hidden aria-live="polite">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div class="sheet">
+        <div>
+          <div class="eyebrow" id="r-id">Pedido</div>
+          <h2 style="margin-top:6px">Resumo do seu orçamento</h2>
+        </div>
+        <div class="meta" id="r-meta"></div>
+        <div class="lines" id="r-lines"></div>
+        <div class="totals" id="r-totals"></div>
+        <ul class="terms">
+          <li>Reserva da data com 50% de sinal; restante na entrega.</li>
+          <li>Pacotes mensais de Reels: pagamento antecipado, mínimo de 3 meses.</li>
+          <li>Deslocamento fora da cidade-base é calculado à parte.</li>
+          <li>Orçamento válido por 15 dias.</li>
+        </ul>
+      </div>
+
+      <div class="cta" id="cta">
+        <h3>Gostou? Vamos conversar</h3>
+        <p>Pronto para fechar? Toque em Reservar. Quer ajustar algo, trocar um item ou falar de valores? Peça para negociar e a Isa entra em contato com você.</p>
+        <div class="cta-row">
+          <button type="button" class="primary" id="b-res">Reservar</button>
+          <button type="button" id="b-neg">Quero negociar</button>
+          <button type="button" id="b-edit">Editar pedido</button>
+        </div>
+      </div>
+
+      <div class="send" id="send" hidden>
+        <h3 id="send-t">Falta só enviar</h3>
+        <p id="send-p"></p>
+        <div class="cta-row" id="send-row"></div>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+        <pre id="send-msg"></pre>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Bellos Cliks · fotografia, vídeo, conteúdo e sites</div>
+    <div class="contato"><a href="https://wa.me/5528992578094" target="_blank" rel="noopener">WhatsApp (28) 99257-8094</a><span aria-hidden="true">·</span><a href="https://instagram.com/belloscliks" target="_blank" rel="noopener">@belloscliks</a></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  /* WhatsApp da Bellos Cliks, só números com DDI e DDD (ex.: 5527999990000). Vazio = envio pelo Direct. */
+  var WHATSAPP = '5528992578094';
+  var INSTAGRAM = 'belloscliks';
+  /* Página hospedada fora do Claude (Netlify ou GitHub Pages): envio na mesma aba e volta para cá */
+  var NO_GITHUB = /(github\.io|netlify\.app)$/.test(location.hostname);
+  /* Recebe o pedido e grava na caixa de orçamentos da Isa (Supabase Edge Function) */
+  var ENDPOINT = 'https://lvbxiqmpnvzuaevdqedt.supabase.co/functions/v1/bellos-pedido/';
+  /* Modo teste: aberto pelo link .../#teste a partir da tabela da Isa */
+  var MODO_TESTE = location.hash === '#teste';
+
+  var CATS = [
+    {id:'ensaio', title:'Ensaio fotográfico', items:[
+      {id:'ens1', name:'Ensaio Essencial', desc:'1h, 1 look, 15 fotos', p:550, inc:['1h de sessão em 1 cenário','1 look com direção de poses','15 fotos tratadas no Lightroom','Galeria online em até 7 dias úteis']},
+      {id:'ens2', name:'Ensaio Profissional', desc:'2h, 2 looks, 30 fotos', p:950, tag:'Mais escolhido', inc:['2h de sessão em 2 cenários','2 looks com direção de poses','30 fotos tratadas no Lightroom','Galeria online em até 7 dias úteis']},
+      {id:'ens3', name:'Marca pessoal completo', desc:'3h no seu espaço, 50 fotos + Stories', p:1600, inc:['3h no seu local de trabalho','3 looks + fotos do ambiente e do atendimento','50 fotos tratadas + 10 verticais para Stories','Galeria online em até 10 dias úteis']}
+    ]},
+    {id:'evento', title:'Cobertura fotográfica de evento', items:[
+      {id:'ev1', name:'Evento social até 3h', desc:'Aniversário, chá, batizado', p:1200, inc:['Até 3h de cobertura','150+ fotos tratadas','Galeria online para compartilhar com convidados','Entrega em até 10 dias úteis']},
+      {id:'ev2', name:'Evento corporativo até 4h', desc:'Palestra, lançamento, confraternização', p:1500, inc:['Até 4h de cobertura','200+ fotos tratadas','Palco, networking, marca e detalhes','Entrega em até 10 dias úteis']},
+      {id:'ev3', name:'Casamento até 8h', desc:'Making of, cerimônia e festa', p:3200, inc:['Até 8h de cobertura','400+ fotos tratadas','Making of, cerimônia e festa','Galeria online em até 20 dias úteis']}
+    ]},
+    {id:'story', title:'Storymaker de eventos', items:[
+      {id:'s1', name:'Storymaker Essencial', desc:'Até 3h, stories ao vivo + 1 Reel', p:750, inc:['Até 3h de cobertura pelo celular','Stories em tempo real no seu perfil','1 Reel de melhores momentos em até 24h']},
+      {id:'s2', name:'Storymaker Completo', desc:'Até 5h, stories ao vivo + 2 Reels', p:1300, tag:'Mais escolhido', inc:['Até 5h: making of, cerimônia e festa','Stories em tempo real no seu perfil','2 Reels em até 24h','Todo o material bruto']},
+      {id:'s3', name:'Storymaker Premium', desc:'Até 8h, Reel no mesmo dia + 3 Reels', p:1900, inc:['Até 8h de cobertura','Reel entregue no mesmo dia do evento','3 Reels em até 24h','Material bruto organizado']}
+    ]},
+    {id:'reels', title:'Reels para o seu Instagram', items:[
+      {id:'r1', name:'Reel avulso', desc:'1 vídeo até 60s com o seu material', p:250, inc:['Edição de 1 vídeo de até 60s com o material que você gravou','Gancho nos 3 primeiros segundos','Legenda, trilha e capa','1 rodada de ajustes']},
+      {id:'r4', name:'Start · 4 Reels por mês', desc:'1 por semana', p:880, m:true, inc:['4 Reels editados por mês (1 por semana)','Gancho, legenda, trilha e capa em cada um','1 rodada de ajustes por vídeo','Calendário de entregas']},
+      {id:'r8', name:'Presença · 8 Reels por mês', desc:'2 por semana', p:1520, m:true, tag:'Mais escolhido', inc:['8 Reels editados por mês (2 por semana)','Gancho, legenda, trilha e capa em cada um','1 rodada de ajustes por vídeo','Calendário de entregas']},
+      {id:'r12', name:'Autoridade · 12 Reels por mês', desc:'3 por semana + roteiro de ganchos', p:2280, m:true, inc:['12 Reels editados por mês (3 por semana)','Roteiro mensal de ganchos e temas','Gancho, legenda, trilha e capa em cada um','1 rodada de ajustes por vídeo']},
+      {id:'rcombo', name:'Gravação + 8 Reels por mês', desc:'A Isa grava e edita pra você', p:2090, m:true, cap:true, inc:['1 manhã ou tarde de gravação por mês, com direção','Ordem de gravação planejada','8 Reels editados (2 por semana)','1 rodada de ajustes por vídeo']}
+    ]},
+    {id:'video', title:'Edição de vídeo', items:[
+      {id:'v1', name:'Vídeo institucional ou depoimento', desc:'Até 3 min', p:650, inc:['Edição de vídeo de até 3 min','Legenda, trilha e correção de cor','1 rodada de ajustes']},
+      {id:'v2', name:'Aftermovie de evento', desc:'1 a 3 min com o material do evento', p:750, inc:['Seleção e edição do material bruto do evento','Vídeo de 1 a 3 min com trilha e cor','1 rodada de ajustes']}
+    ]},
+    {id:'foto', title:'Edição das suas fotos', items:[
+      {id:'f1', name:'Tratamento básico', desc:'Cor, luz e recorte · mín. 20 fotos', p:8, unit:true, inc:['Correção de cor e exposição','Recorte e alinhamento','Exportação para web e impressão']},
+      {id:'f2', name:'Tratamento avançado', desc:'Pele e retoques · mín. 20 fotos', p:25, unit:true, inc:['Tudo do tratamento básico','Tratamento de pele natural','Remoção de objetos e ajustes locais']}
+    ]},
+    {id:'diaria', title:'Diária de captação (material bruto)', items:[
+      {id:'meia', name:'Meia diária', desc:'Até 4h de foto ou vídeo, sem edição', p:650, cap:true, inc:['Até 4h de captação de foto ou vídeo','Preparo de equipamento e deslocamento na cidade','Material bruto organizado em pasta online']},
+      {id:'diaria', name:'Diária completa', desc:'Até 8h de foto ou vídeo, sem edição', p:1100, cap:true, inc:['Até 8h de captação de foto ou vídeo','Preparo de equipamento e deslocamento na cidade','Material bruto organizado em pasta online']}
+    ]},
+    {id:'web', title:'Sites e plataformas', items:[
+      {id:'w1', name:'Página única (landing page)', desc:'Uma página que apresenta você e leva ao WhatsApp', p:1600, inc:['Página responsiva com até 6 seções','Textos organizados para converter + botão de WhatsApp','SEO básico e formulário de contato','Hospedagem gratuita configurada (domínio próprio pago à parte)','2 rodadas de ajustes · entrega em até 10 dias úteis']},
+      {id:'w2', name:'Site institucional', desc:'Até 5 páginas: início, sobre, serviços, portfólio e contato', p:3600, tag:'Mais escolhido', inc:['Até 5 páginas com design sob medida','Responsivo para celular e computador','SEO básico, mapa e Google Analytics','Hospedagem gratuita configurada (domínio próprio pago à parte)','2 rodadas de ajustes · entrega em até 20 dias úteis']},
+      {id:'w3', name:'Plataforma sob medida', desc:'Área do cliente, cadastros e painel de gestão', p:6900, note:'valor inicial', inc:['Reunião para definir o que a plataforma precisa fazer','Área do cliente, formulários e banco de dados','Painel para você acompanhar pedidos ou cadastros','Hospedagem gratuita configurada (domínio próprio pago à parte)','Escopo e valor final confirmados após a reunião']},
+      {id:'w4', name:'Apresentação 3D interativa', desc:'Projeto, ambiente ou produto em 3D navegável na web', p:2800, inc:['Modelo 3D ou tour virtual que gira e navega no celular e no computador','Otimização para carregar rápido','Página pronta para compartilhar com seus clientes','1 rodada de ajustes']},
+      {id:'w5', name:'Manutenção do site', desc:'Atualizações e cuidados todo mês', p:150, m:true, inc:['Atualização de textos, fotos e preços','Backup e monitoramento do site','Até 1h30 de ajustes por mês']}
+    ]}
+  ];
+  var EXTRAS = [
+    {id:'x-exp', name:'Entrega expressa em 24h', hint:'+30% sobre os serviços de foto e vídeo (não vale para sites)', pct:30},
+    {id:'x-ads', name:'Uso em anúncios pagos', hint:'+20% sobre os serviços (licença de uso)', pct:20},
+    {id:'x-desl', name:'Serviço fora da minha cidade', hint:'Deslocamento calculado à parte (sob análise)', analise:true}
+  ];
+  var MIN_FOTOS = 20;
+  var ROTEIRO_PRECO = 60;
+  var ROT_PADRAO = {meia:4, diaria:8, rcombo:8};
+  var ROT_INC = ['Pesquisa de temas e referências do seu nicho','Roteiro com gancho, desenvolvimento e chamada para ação','1 rodada de ajustes antes da gravação'];
+
+  var brl = new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+  function money(v){ return brl.format(Math.round(v*100)/100).replace(',00',''); }
+  function $(id){ return document.getElementById(id); }
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+
+  /* Render service options (no prices) */
+  var catsBox = $('cats');
+  CATS.forEach(function(c){
+    var box = el('div','cat'); box.appendChild(el('h3',null,c.title));
+    var grid = el('div','opts');
+    c.items.forEach(function(it){
+      var lab = el('label','opt-card'); lab.setAttribute('for','o-'+it.id);
+      var cb = document.createElement('input'); cb.type='checkbox'; cb.id='o-'+it.id; cb.name='serv'; cb.value=it.id;
+      lab.appendChild(cb);
+      if(it.tag) lab.appendChild(el('span','tag',it.tag));
+      lab.appendChild(el('span','t',it.name));
+      lab.appendChild(el('span','d',it.desc + (it.m ? ' · mensal' : '')));
+      if(it.unit){
+        var q = el('span','qty'); var qi = document.createElement('input');
+        qi.type='number'; qi.id='q-'+it.id; qi.min=String(MIN_FOTOS); qi.step='1'; qi.value=String(MIN_FOTOS); qi.setAttribute('aria-label','Quantidade de fotos para '+it.name);
+        qi.addEventListener('click',function(e){ e.stopPropagation(); });
+        q.appendChild(el('span',null,'Fotos:')); q.appendChild(qi); lab.appendChild(q);
+      }
+      grid.appendChild(lab);
+    });
+    box.appendChild(grid); catsBox.appendChild(box);
+  });
+  var exBox = $('extras');
+  EXTRAS.forEach(function(x){
+    var lab = el('label'); var cb = document.createElement('input'); cb.type='checkbox'; cb.id=x.id;
+    var sp = el('span',null,x.name); sp.appendChild(el('small',null,x.hint));
+    lab.appendChild(cb); lab.appendChild(sp); exBox.appendChild(lab);
+  });
+
+  function selected(){
+    var out = [];
+    CATS.forEach(function(c){ c.items.forEach(function(it){
+      if($('o-'+it.id).checked){
+        var qty = 1;
+        if(it.unit){ qty = Math.max(MIN_FOTOS, Math.round(parseFloat($('q-'+it.id).value) || MIN_FOTOS)); }
+        out.push({it:it, cat:c.title, qty:qty, total:it.p*qty});
+      }
+    }); });
+    return out;
+  }
+  /* Roteiros: shown only when a service with recording is selected */
+  var rotTouched = false;
+  $('rot-qtd').addEventListener('input', function(){ rotTouched = true; $('rot-bella').checked = true; });
+  $('rot-qtd').addEventListener('click', function(e){ e.stopPropagation(); });
+  function capSelected(){ return selected().filter(function(s){ return s.it.cap; }); }
+  function updateRot(){
+    var caps = capSelected(); $('rot-box').hidden = !caps.length;
+    if(caps.length && !rotTouched){ $('rot-qtd').value = String(caps.reduce(function(a, s){ return a + (ROT_PADRAO[s.it.id] || 4); }, 0)); }
+    if(!caps.length) $('e-rot').textContent = '';
+  }
+  function rotMode(){ if($('rot-box').hidden) return ''; return $('rot-bella').checked ? 'bella' : ($('rot-cliente').checked ? 'cliente' : ''); }
+  function rotItem(){
+    var mode = rotMode(); if(!mode) return null;
+    var caps = capSelected(), mensal = caps.length > 0 && caps.every(function(s){ return s.it.m; });
+    if(mode === 'cliente') return {it:{id:'rot', name:'Roteiros e ideias por sua conta', p:0, free:true, inc:['Você envia temas ou roteiros até 3 dias antes da gravação','A Isa organiza a ordem de gravação do dia']}, cat:'Roteiros', qty:1, total:0};
+    var q = Math.min(30, Math.max(1, Math.round(parseFloat($('rot-qtd').value) || 1)));
+    return {it:{id:'rot', name:'Criação de roteiros · ' + q + (q > 1 ? ' vídeos' : ' vídeo'), p:ROTEIRO_PRECO, m:mensal, note:money(ROTEIRO_PRECO) + ' por roteiro', inc:ROT_INC}, cat:'Roteiros', qty:q, total:q*ROTEIRO_PRECO};
+  }
+
+  function updateCount(){
+    updateRot();
+    var n = selected().length, custom = $('f-custom').value.trim();
+    $('count').textContent = (n ? n + (n>1?' serviços marcados':' serviço marcado') : 'Nenhum serviço marcado') + (custom ? ' + pedido personalizado' : '');
+  }
+  $('form').addEventListener('change', updateCount);
+  $('f-custom').addEventListener('input', updateCount);
+
+  /* Build the quote */
+  var quote = null;
+  function build(){
+    var sel = selected();
+    var rot = rotItem(); if(rot) sel.push(rot);
+    var unico = 0, mensal = 0;
+    var unicoExp = 0;
+    sel.forEach(function(s){ if(s.it.m) mensal += s.total; else { unico += s.total; if(!/^w\d/.test(s.it.id)) unicoExp += s.total; } });
+    var extras = [], analise = [];
+    EXTRAS.forEach(function(x){
+      if(!$(x.id).checked) return;
+      if(x.analise){ analise.push(x.name); return; }
+      var base = x.id === 'x-exp' ? unicoExp : unico + mensal;
+      if(base > 0) extras.push({name:x.name, pct:x.pct, base:base, v:base*x.pct/100, mensal: x.id === 'x-ads' ? mensal*x.pct/100 : 0, unico: x.id === 'x-ads' ? unico*x.pct/100 : base*x.pct/100});
+    });
+    extras.forEach(function(x){ unico += x.unico; mensal += x.mensal; });
+    var custom = $('f-custom').value.trim();
+    if(custom) analise.unshift('Pedido personalizado');
+    return {
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      nome: $('f-nome').value.trim(), whats: $('f-whats').value.trim(),
+      data: $('f-data').value, local: $('f-local').value.trim(),
+      sel: sel, extras: extras, analise: analise, custom: custom,
+      unico: Math.round(unico*100)/100, mensal: Math.round(mensal*100)/100
+    };
+  }
+
+  function fmtDate(iso){ if(!iso) return 'A definir'; var p = iso.split('-'); return p.length===3 ? p[2]+'/'+p[1]+'/'+p[0] : iso; }
+
+  function renderSummary(q){
+    $('r-id').textContent = 'Pedido ' + q.id.toUpperCase();
+    var meta = $('r-meta'); meta.textContent = '';
+    [['Nome ou empresa',q.nome],['WhatsApp',q.whats],['Data',fmtDate(q.data)],['Local',q.local || 'A definir']].forEach(function(p){
+      var d = el('div'); d.appendChild(el('span','k',p[0])); d.appendChild(el('span','v',p[1])); meta.appendChild(d);
+    });
+    var lines = $('r-lines'); lines.textContent = '';
+    q.sel.forEach(function(s){
+      var row = el('div','line');
+      var left = el('div'); left.appendChild(el('div','cat-l',s.cat)); left.appendChild(el('div','nm',s.it.name + (s.it.unit ? ' · ' + s.qty + ' fotos' : '')));
+      row.appendChild(left);
+      var pr = el('div','pr', s.it.free ? 'Sem custo' : money(s.total));
+      if(s.it.unit) pr.appendChild(el('small',null, money(s.it.p) + ' por foto'));
+      if(s.it.note) pr.appendChild(el('small',null, s.it.note));
+      if(s.it.m) pr.appendChild(el('small',null,'por mês'));
+      row.appendChild(pr);
+      var ul = el('ul'); s.it.inc.forEach(function(t){ ul.appendChild(el('li',null,t)); }); row.appendChild(ul);
+      lines.appendChild(row);
+    });
+    q.extras.forEach(function(x){
+      var row = el('div','line');
+      var left = el('div'); left.appendChild(el('div','cat-l','Extra')); left.appendChild(el('div','nm',x.name)); row.appendChild(left);
+      var pr = el('div','pr', money(x.v)); pr.appendChild(el('small',null, x.pct + '% sobre ' + money(x.base))); row.appendChild(pr);
+      lines.appendChild(row);
+    });
+    if(q.custom){
+      var row = el('div','line analise');
+      var left = el('div'); left.appendChild(el('div','cat-l','Personalizado')); left.appendChild(el('div','nm','Seu pedido específico')); row.appendChild(left);
+      row.appendChild(el('div','pr','Sob análise'));
+      row.appendChild(el('div','custom',q.custom));
+      lines.appendChild(row);
+    }
+    if(q.analise.indexOf('Serviço fora da minha cidade') > -1){
+      var r2 = el('div','line analise');
+      var l2 = el('div'); l2.appendChild(el('div','cat-l','Extra')); l2.appendChild(el('div','nm','Deslocamento fora da cidade')); r2.appendChild(l2);
+      r2.appendChild(el('div','pr','Sob análise')); lines.appendChild(r2);
+    }
+    var tot = $('r-totals'); tot.textContent = '';
+    function addTot(k, v, sub){ var t = el('div','tot'+(sub?' sub':'')); t.appendChild(el('span','k',k)); t.appendChild(el('span','v',v)); tot.appendChild(t); }
+    var both = q.unico > 0 && q.mensal > 0;
+    if(q.unico > 0) addTot(both ? 'Valor único' : 'Total', money(q.unico), both);
+    if(q.mensal > 0) addTot(both ? 'Mensal' : 'Total por mês', money(q.mensal) + (both?'/mês':''), both);
+    if(both){ var t = el('div','tot'); t.appendChild(el('span','k','Primeiro mês')); t.appendChild(el('span','v',money(q.unico+q.mensal))); tot.appendChild(t); }
+    if(q.analise.length) tot.appendChild(el('p','note', (q.unico||q.mensal ? 'Mais ' : '') + q.analise.join(' e ').toLowerCase() + ' em análise: a Isa envia o valor em até 24h úteis.'));
+  }
+
+  /* Encode the request so it can be pasted into the Bellos Cliks panel */
+  function encode(obj){
+    var s = JSON.stringify(obj);
+    var b = btoa(unescape(encodeURIComponent(s)));
+    return 'BC1.' + b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  function payload(q, intent){
+    return {v:1, id:q.id, ts:new Date().toISOString(), a:intent, n:q.nome, w:q.whats, d:q.data, l:q.local,
+      i:q.sel.map(function(s){ return [s.it.name + (s.it.unit ? ' ('+s.qty+' fotos)' : ''), s.total, s.it.m?1:0]; }),
+      x:q.extras.map(function(x){ return [x.name, Math.round(x.v*100)/100]; }),
+      an:q.analise, c:q.custom, tu:q.unico, tm:q.mensal, t:MODO_TESTE ? 1 : 0, o:NO_GITHUB ? location.origin + '/' : 'art'};
+  }
+  function message(q, intent){
+    var t = 'Oi, Isa! ' + (intent === 'reservar' ? 'Quero *reservar* com este orçamento' : 'Quero *negociar* este orçamento') + ' 📸\n\n';
+    t += '*Nome:* ' + q.nome + '\n*WhatsApp:* ' + q.whats + '\n*Data:* ' + fmtDate(q.data) + '\n*Local:* ' + (q.local || 'A definir') + '\n\n*Serviços:*\n';
+    q.sel.forEach(function(s){ t += '• ' + s.it.name + (s.it.unit ? ' ('+s.qty+' fotos)' : '') + ' — ' + (s.it.free ? 'sem custo' : money(s.total) + (s.it.m ? '/mês' : '')) + '\n'; });
+    q.extras.forEach(function(x){ t += '• ' + x.name + ' — ' + money(x.v) + '\n'; });
+    if(q.custom) t += '\n*Personalizado (sob análise):*\n' + q.custom + '\n';
+    if(q.analise.indexOf('Serviço fora da minha cidade') > -1) t += '\nDeslocamento fora da cidade (sob análise)\n';
+    t += '\n';
+    if(q.unico > 0) t += '*Valor único:* ' + money(q.unico) + '\n';
+    if(q.mensal > 0) t += '*Mensal:* ' + money(q.mensal) + '\n';
+    t += '\nCódigo do pedido: ' + encode(payload(q, intent));
+    return t;
+  }
+
+  $('form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var okDados = $('f-nome').value.trim() && $('f-whats').value.replace(/\D/g,'').length >= 10;
+    $('e-dados').textContent = okDados ? '' : 'Preencha seu nome ou empresa e um WhatsApp com DDD.';
+    var okServ = selected().length || $('f-custom').value.trim();
+    $('e-serv').textContent = okServ ? '' : 'Marque pelo menos um serviço ou descreva o que precisa no passo 03.';
+    var okRot = $('rot-box').hidden || rotMode();
+    $('e-rot').textContent = okRot ? '' : 'Escolha quem vai preparar os roteiros da gravação.';
+    if(!okDados){ $('f-nome').focus(); return; }
+    if(!okServ) return;
+    if(!okRot){ $('rot-box').scrollIntoView({behavior:'smooth', block:'center'}); return; }
+    quote = build();
+    renderSummary(quote);
+    $('form').hidden = true; $('result').hidden = false; $('send').hidden = true; $('cta').hidden = false;
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  $('b-edit').addEventListener('click', function(){
+    $('result').hidden = true; $('form').hidden = false; window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  function copy(text, done){
+    function fallback(){
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); var ok=false; try{ ok = document.execCommand('copy'); }catch(err){}
+      document.body.removeChild(ta); done(ok);
+    }
+    try{ navigator.clipboard.writeText(text).then(function(){ done(true); }, fallback); }catch(e){ fallback(); }
+  }
+
+  function openSend(intent){
+    var msg = message(quote, intent);
+    var code = encode(payload(quote, intent));
+    $('send-t').textContent = intent === 'reservar' ? 'Ótima escolha! Falta só enviar' : 'Combinado! Falta só enviar';
+    $('send-p').textContent = 'Toque em Enviar pedido. Ele chega direto para a Isa, que te chama no WhatsApp em até 24h úteis.';
+    var row = $('send-row'); row.textContent = '';
+    var go = el('a','btn','Enviar pedido para a Isa');
+    go.href = ENDPOINT + code;
+    if(!NO_GITHUB){ go.target = '_blank'; go.rel = 'noopener'; }
+    function enviado(){
+      $('send-t').textContent = 'Pedido enviado ✓';
+      $('send-p').textContent = 'Recebido! A Isa vai analisar e te chamar no WhatsApp ' + quote.whats + ' em até 24h úteis. Se preferir adiantar, você também pode mandar o pedido por mensagem.';
+      go.textContent = 'Enviar de novo'; go.style.background = 'var(--surface)'; go.style.color = 'var(--ink)'; go.style.border = '1px solid var(--line)';
+    }
+    go.addEventListener('click', function(e){
+      if(!NO_GITHUB){ enviado(); return; }
+      /* Hospedada (Netlify/app instalado): envia sem sair da página */
+      e.preventDefault();
+      if(go.dataset.busy) return;
+      go.dataset.busy = '1'; var txt = go.textContent; go.textContent = 'Enviando…';
+      fetch(go.href + '?r=json', {cache:'no-store'}).then(function(r){ return r.json().then(function(j){ return {ok:r.ok && j && j.ok, motivo:j && j.motivo}; }, function(){ return {ok:false}; }); })
+        .then(function(res){
+          if(res.ok){ enviado(); return; }
+          go.textContent = txt;
+          $('send-p').textContent = res.motivo === 'limite'
+            ? 'Muitos pedidos chegaram agora há pouco. Tente de novo em alguns minutos ou fale com a Isa pelo WhatsApp.'
+            : 'Não conseguimos registrar o pedido. Toque em Falar no WhatsApp para enviar por mensagem.';
+        }, function(){ window.location.href = go.href; })
+        .then(function(){ delete go.dataset.busy; });
+    });
+    row.appendChild(go);
+    if(WHATSAPP){
+      var a = el('a','btn','Falar no WhatsApp');
+      a.href = 'https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(msg); a.target = '_blank'; a.rel = 'noopener';
+      a.style.background='var(--surface)'; a.style.color='var(--ink)'; a.style.border='1px solid var(--line)';
+      row.appendChild(a);
+    }
+    if(INSTAGRAM){
+      var ig = el('a','btn','Abrir Direct'); ig.href = 'https://ig.me/m/' + INSTAGRAM; ig.target='_blank'; ig.rel='noopener';
+      ig.style.background='var(--surface)'; ig.style.color='var(--ink)'; ig.style.border='1px solid var(--line)';
+      row.appendChild(ig);
+    }
+    var b = el('button', null, 'Copiar pedido'); b.type = 'button';
+    b.addEventListener('click', function(){ copy(msg, function(ok){ $('toast').textContent = ok ? 'Pedido copiado. Agora é só colar e enviar.' : 'Não deu para copiar automaticamente. Selecione o texto abaixo.'; }); });
+    row.appendChild(b);
+    $('send-msg').textContent = msg;
+    $('toast').textContent = '';
+    $('send').hidden = false;
+    $('send').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+  $('b-neg').addEventListener('click', function(){ openSend('negociar'); });
+  $('b-res').addEventListener('click', function(){ openSend('reservar'); });
+
+  /* Test mode banner with a one-tap example order */
+  if(MODO_TESTE){
+    var tb = el('div','note');
+    tb.style.cssText = 'display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between';
+    var tt = el('span',null,'Modo teste: o pedido enviado daqui chega na sua caixa marcado como "Teste", e você pode apagar todos depois.');
+    var fill = el('button',null,'Preencher com um cliente de exemplo'); fill.type = 'button';
+    fill.addEventListener('click', function(){
+      var d = new Date(); d.setDate(d.getDate() + 30);
+      $('f-nome').value = 'Clínica Exemplo (teste)'; $('f-whats').value = '(27) 99999-0000';
+      $('f-data').value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      $('f-local').value = 'Vitória, Praia do Canto';
+      ['o-ens2','o-rcombo','o-w1'].forEach(function(id){ if($(id)) $(id).checked = true; });
+      updateCount();
+      if($('rot-bella')){ $('rot-bella').checked = true; }
+      updateCount();
+      fill.textContent = 'Exemplo preenchido ✓ Role até o fim e toque em Concluir';
+    });
+    tb.appendChild(tt); tb.appendChild(fill);
+    var hdr = document.querySelector('header'); hdr.parentNode.insertBefore(tb, hdr.nextSibling);
+  }
+
+  /* App instalável: registra o service worker quando a página está hospedada */
+  if(NO_GITHUB && 'serviceWorker' in navigator){
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('/sw.js').catch(function(){}); });
+  }
+
+  /* Return screen after the order endpoint redirects back here */
+  if(location.hash === '#enviado' || location.hash === '#erro'){
+    var ok = location.hash === '#enviado';
+    $('form').hidden = true;
+    var box = el('section','sheet'); box.setAttribute('aria-live','polite');
+    box.appendChild(el('div','eyebrow', ok ? 'Pedido recebido' : 'Pedido não registrado'));
+    box.appendChild(el('h2', null, ok ? 'Tudo certo! Seu pedido chegou ✓' : 'Ops, seu pedido não foi registrado'));
+    box.appendChild(el('p','lede', ok
+      ? 'A Isa vai analisar o seu orçamento e te chamar no WhatsApp que você informou em até 24h úteis. Pode fechar esta aba.'
+      : 'Volte para a aba anterior e toque em Copiar pedido para enviar pela mensagem. Assim a Isa recebe do mesmo jeito.'));
+    var again = el('button', ok ? null : 'primary', 'Fazer outro orçamento'); again.type = 'button';
+    again.style.alignSelf = 'flex-start';
+    again.addEventListener('click', function(){ box.remove(); $('form').hidden = false; try{ history.replaceState(null,'',location.pathname); }catch(e){} });
+    box.appendChild(again);
+    $('form').parentNode.insertBefore(box, $('form'));
+  }
+
+  updateCount();
+})();
+</script>
