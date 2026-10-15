@@ -7,7 +7,6 @@
 <meta property="og:title" content="Orçamento Bellos Cliks">
 <meta property="og:description" content="Foto, vídeo, Reels, storymaker e sites. Monte seu orçamento em 2 minutos e veja o valor na hora.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://isabellaperes2508-alt.github.io/bellos-cliks/">
 <meta name="theme-color" content="#A3285F">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23A3285F'/%3E%3Ccircle cx='16' cy='17' r='7' fill='none' stroke='white' stroke-width='3'/%3E%3Crect x='10' y='6' width='7' height='4' rx='1.5' fill='white'/%3E%3C/svg%3E">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
@@ -254,7 +253,8 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
   /* WhatsApp da Bellos Cliks, só números com DDI e DDD (ex.: 5527999990000). Vazio = envio pelo Direct. */
   var WHATSAPP = '5528992578094';
   var INSTAGRAM = 'belloscliks';
-  var NO_GITHUB = /github\.io$/.test(location.hostname);
+  /* Página hospedada fora do Claude (Netlify ou GitHub Pages): envio na mesma aba e volta para cá */
+  var NO_GITHUB = /(github\.io|netlify\.app)$/.test(location.hostname);
   /* Recebe o pedido e grava na caixa de orçamentos da Isa (Supabase Edge Function) */
   var ENDPOINT = 'https://lvbxiqmpnvzuaevdqedt.supabase.co/functions/v1/bellos-pedido/';
   /* Modo teste: aberto pelo link .../#teste a partir da tabela da Isa */
@@ -470,7 +470,7 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
     return {v:1, id:q.id, ts:new Date().toISOString(), a:intent, n:q.nome, w:q.whats, d:q.data, l:q.local,
       i:q.sel.map(function(s){ return [s.it.name + (s.it.unit ? ' ('+s.qty+' fotos)' : ''), s.total, s.it.m?1:0]; }),
       x:q.extras.map(function(x){ return [x.name, Math.round(x.v*100)/100]; }),
-      an:q.analise, c:q.custom, tu:q.unico, tm:q.mensal, t:MODO_TESTE ? 1 : 0, o:NO_GITHUB ? 'gh' : 'art'};
+      an:q.analise, c:q.custom, tu:q.unico, tm:q.mensal, t:MODO_TESTE ? 1 : 0, o:NO_GITHUB ? location.origin + '/' : 'art'};
   }
   function message(q, intent){
     var t = 'Oi, Isa! ' + (intent === 'reservar' ? 'Quero *reservar* com este orçamento' : 'Quero *negociar* este orçamento') + ' 📸\n\n';
