@@ -7,9 +7,9 @@ head = '''<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Monte seu orçamento de foto, vídeo, Reels, storymaker e sites com a Bellos Cliks e veja o valor na hora.">
-<meta property="og:title" content="Orçamento Bellos Cliks">
-<meta property="og:description" content="Foto, vídeo, Reels, storymaker e sites. Monte seu orçamento em 2 minutos e veja o valor na hora.">
+<meta name="description" content="Peça seu site, agendamento online ou sistema com a Bellos Clicks, web designer criativa do ES. Foto, vídeo e Reels com valor na hora.">
+<meta property="og:title" content="Orçamento Bellos Clicks">
+<meta property="og:description" content="Sites, agendamento online e sistemas para salões, clínicas e consultórios do ES, além de foto e vídeo. Monte seu pedido em 2 minutos.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://belloscliks.netlify.app/">
 <meta property="og:image" content="https://belloscliks.netlify.app/assets/og-bellos-clicks.jpg">
@@ -21,7 +21,7 @@ head = '''<!doctype html>
 <meta name="theme-color" content="#5E3A84">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Bellos Cliks">
+<meta name="apple-mobile-web-app-title" content="Bellos Clicks">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png">
