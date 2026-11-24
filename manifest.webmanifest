@@ -1,6 +1,6 @@
 {
-  "name": "Orçamento Bellos Cliks",
-  "short_name": "Bellos Cliks",
+  "name": "Orçamento Bellos Clicks",
+  "short_name": "Bellos Clicks",
   "description": "Monte seu orçamento de foto, vídeo, Reels, storymaker e sites e veja o valor na hora.",
   "lang": "pt-BR",
   "id": "/",
@@ -8,8 +8,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#5E3A84",
-  "theme_color": "#5E3A84",
+  "background_color": "#1C1324",
+  "theme_color": "#1C1324",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
