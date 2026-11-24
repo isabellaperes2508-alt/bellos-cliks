@@ -315,8 +315,8 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
       </section>
 
       <div class="cta" id="cta">
-        <h3>Gostou? Vamos <span class="kw">conversar</span></h3>
-        <p>Pronto para fechar? Toque em Reservar. Quer ajustar algo, trocar um item ou falar de valores? Peça para negociar e a Isa entra em contato com você.</p>
+        <h3 id="cta-t">Gostou? Vamos <span class="kw">conversar</span></h3>
+        <p id="cta-p">Pronto para fechar? Toque em Reservar. Quer ajustar algo, trocar um item ou falar de valores? Peça para negociar e a Isa entra em contato com você.</p>
         <div class="cta-row">
           <button type="button" class="primary" id="b-res">Reservar</button>
           <button type="button" id="b-neg">Quero negociar</button>
@@ -561,6 +561,16 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
     if(both){ var t = el('div','tot'); t.appendChild(el('span','k','Primeiro mês')); t.appendChild(el('span','v',money(q.unico+q.mensal))); tot.appendChild(t); }
     if(q.proposta) tot.appendChild(el('p','note', 'Sites e sistemas: o valor vem na proposta, depois de uma conversa de 20 minutos. Veja abaixo as 6 fases do projeto.'));
     $('r-fases').hidden = !q.proposta;
+    /* Sites e sistemas: os botões viram proposta e conversa inicial */
+    if(q.proposta){
+      $('cta-t').innerHTML = 'Vamos começar o seu <span class="kw">projeto?</span>';
+      $('cta-p').textContent = 'Já sabe o que precisa? Toque em Gerar proposta e a Isa prepara a sua com escopo, prazo e valor. Prefere conversar antes? Agende a conversa inicial de 20 minutos (Meet ou café).';
+      $('b-res').textContent = 'Gerar proposta'; $('b-neg').textContent = 'Agendar conversa inicial';
+    } else {
+      $('cta-t').innerHTML = 'Gostou? Vamos <span class="kw">conversar</span>';
+      $('cta-p').textContent = 'Pronto para fechar? Toque em Reservar. Quer ajustar algo, trocar um item ou falar de valores? Peça para negociar e a Isa entra em contato com você.';
+      $('b-res').textContent = 'Reservar'; $('b-neg').textContent = 'Quero negociar';
+    }
     if(q.analise.length) tot.appendChild(el('p','note', (q.unico||q.mensal ? 'Mais ' : '') + q.analise.join(' e ').toLowerCase() + ' em análise: a Isa envia o valor em até 24h úteis.'));
   }
 
@@ -574,14 +584,14 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
     return {v:1, id:q.id, ts:new Date().toISOString(), a:intent, n:q.nome, w:q.whats, d:q.data, l:q.local,
       i:q.sel.map(function(s){ return [s.it.name + (s.it.unit ? ' ('+s.qty+' fotos)' : ''), s.total, s.it.m?1:0]; }),
       x:q.extras.map(function(x){ return [x.name, Math.round(x.v*100)/100]; }),
-      an:q.analise, c:q.custom, tu:q.unico, tm:q.mensal, t:MODO_TESTE ? 1 : 0, o:NO_GITHUB ? location.origin + '/' : 'art'};
+      an:q.proposta ? q.analise.concat(['Site/sistema: ' + (intent === 'reservar' ? 'gerar proposta' : 'agendar conversa inicial')]) : q.analise, c:q.custom, tu:q.unico, tm:q.mensal, t:MODO_TESTE ? 1 : 0, o:NO_GITHUB ? location.origin + '/' : 'art'};
   }
   function message(q, intent){
-    var t = 'Oi, Isa! ' + (intent === 'reservar' ? 'Quero *reservar* com este orçamento' : 'Quero *negociar* este orçamento') + ' 📸\n\n';
+    var t = 'Oi, Isa! ' + (q.proposta ? (intent === 'reservar' ? 'Quero *gerar a proposta* do meu projeto' : 'Quero *agendar a conversa inicial* sobre o meu projeto') : (intent === 'reservar' ? 'Quero *reservar* com este orçamento' : 'Quero *negociar* este orçamento')) + ' ✦\n\n';
     t += '*Nome:* ' + q.nome + '\n*WhatsApp:* ' + q.whats + '\n*Data:* ' + fmtDate(q.data) + '\n*Local:* ' + (q.local || 'A definir') + '\n\n*Serviços:*\n';
     q.sel.forEach(function(s){ t += '• ' + s.it.name + (s.it.unit ? ' ('+s.qty+' fotos)' : '') + ' — ' + (s.it.prop ? 'valor na proposta' : s.it.free ? 'sem custo' : money(s.total) + (s.it.m ? '/mês' : '')) + '\n'; });
     q.extras.forEach(function(x){ t += '• ' + x.name + ' — ' + money(x.v) + '\n'; });
-    if(q.proposta) t += '\nQuero marcar a conversa de 20 min sobre o site/sistema.\n';
+    if(q.proposta) t += '\n' + (intent === 'reservar' ? 'Pode preparar a proposta do site/sistema.' : 'Quero marcar a conversa de 20 min (Meet ou café) sobre o site/sistema.') + '\n';
     if(q.custom) t += '\n*Personalizado (sob análise):*\n' + q.custom + '\n';
     if(q.analise.indexOf('Serviço fora da minha cidade') > -1) t += '\nDeslocamento fora da cidade (sob análise)\n';
     t += '\n';
@@ -624,7 +634,7 @@ footer a:hover,footer a:focus-visible{text-decoration:underline}
   function openSend(intent){
     var msg = message(quote, intent);
     var code = encode(payload(quote, intent));
-    $('send-t').textContent = intent === 'reservar' ? 'Ótima escolha! Falta só enviar' : 'Combinado! Falta só enviar';
+    $('send-t').textContent = quote.proposta ? (intent === 'reservar' ? 'Sua proposta está a um passo' : 'Sua conversa está a um passo') : (intent === 'reservar' ? 'Ótima escolha! Falta só enviar' : 'Combinado! Falta só enviar');
     $('send-p').textContent = 'Toque em Enviar pedido. Ele chega direto para a Isa, que te chama no WhatsApp em até 24h úteis.';
     var row = $('send-row'); row.textContent = '';
     var go = el('a','btn seta','Enviar pedido para a Isa');
