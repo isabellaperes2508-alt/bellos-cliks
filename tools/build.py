@@ -18,7 +18,7 @@ head = '''<!doctype html>
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://belloscliks.netlify.app/">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#5E3A84">
+<meta name="theme-color" content="#1C1324">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Bellos Clicks">
